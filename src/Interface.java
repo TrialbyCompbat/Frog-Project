@@ -10,8 +10,18 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-
+//Usually you will require both swing and awt packages
+// even if you are working with just swings.
+import javax.swing.*;
+import java.awt.*;
+	
 import javax.swing.JFileChooser;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.EtchedBorder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class Interface {
 
@@ -21,59 +31,118 @@ public class Interface {
 	public static void main(String[] args) throws NumberFormatException, IOException
 	{
 		
-		Scanner scanner = new Scanner(System.in);
+
+        //Creating the Frame
+        JFrame frame = new JFrame("Chat Frame");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1080, 720);
+
+        //Creating the MenuBar and adding components
+        JMenuBar mb = new JMenuBar();
+        JMenu m1 = new JMenu("FILE");
+        JMenu m2 = new JMenu("Help");
+        mb.add(m1);
+        mb.add(m2);
+        JMenuItem m11 = new JMenuItem("Open");
+        JMenuItem m22 = new JMenuItem("Save as");
+        m1.add(m11);
+        m1.add(m22);
+
+        //Creating the panel at bottom and adding components
+        JPanel panel = new JPanel(); // the panel is not visible in output
+        JLabel label = new JLabel("Enter Text");
+        JTextField tf = new JTextField(10); // accepts upto 10 characters
+        JButton send = new JButton("Send");
+        JButton reset = new JButton("Reset");
+        panel.add(label); // Components Added using Flow Layout
+        panel.add(label); // Components Added using Flow Layout
+        panel.add(tf);
+        panel.add(send);
+        panel.add(reset);
+
+        //Adding Components to the frame.
+        frame.getContentPane().add(BorderLayout.SOUTH, panel);
+        frame.getContentPane().add(BorderLayout.NORTH, mb);
+        
+        JPanel panel_1 = new JPanel();
+        frame.getContentPane().add(panel_1, BorderLayout.WEST);
+        panel_1.setLayout(new FormLayout(new ColumnSpec[] {
+        		FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
+        		ColumnSpec.decode("36px"),
+        		FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
+        		ColumnSpec.decode("115px"),},
+        	new RowSpec[] {
+        		FormSpecs.LABEL_COMPONENT_GAP_ROWSPEC,
+        		RowSpec.decode("48px"),}));
+        
+        JList list = new JList();
+        list.setModel(new AbstractListModel() {
+        	String[] values = new String[] {"test ", "test"};
+        	public int getSize() {
+        		return values.length;
+        	}
+        	public Object getElementAt(int index) {
+        		return values[index];
+        	}
+        });
+        list.setValueIsAdjusting(true);
+        list.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+        panel_1.add(list, "2, 2, 3, 1, left, top");
+        frame.setVisible(true);
 		
-		System.out.println("Welcome to Basic Network Builder");
-		System.out.println("");
-		
-		while(!quit)
-		{
-			printOptions();
-			
-			switch(scanner.nextLine())
-			{
-				case "1":
-					create(scanner);
-					break;
-				case "2":
-					load(scanner);
-					break;
-				case "3":
-					save(scanner);
-					break;
-				case "4":
-					delete();
-					break;
-				case "5":
-					train(scanner);
-					break;
-				case "6":
-					test(scanner);
-					break;
-				case "7":
-					dsp();
-					break;
-				case "8":
-					saveVerilog(scanner);
-					break;
-				case "9":
-					quit();
-					break;
-				case "10":
-					printAsC(scanner);
-					break;
-				case "11":
-					printToFile(scanner);
-					break;
-				case "12":
-					automateTraining(scanner);
-					break;
-				default:
-					System.out.println("Invalid Input. Please Enter a valid option.");
-					break;
-			}
-			
-		}
+//		Scanner scanner = new Scanner(System.in);
+//		
+//		System.out.println("Welcome to Basic Network Builder");
+//		System.out.println("");
+//		
+//		while(!quit)
+//		{
+//			printOptions();
+//			
+//			switch(scanner.nextLine())
+//			{
+//				case "1":
+//					create(scanner);
+//					break;
+//				case "2":
+//					load(scanner);
+//					break;
+//				case "3":
+//					save(scanner);
+//					break;
+//				case "4":
+//					delete();
+//					break;
+//				case "5":
+//					train(scanner);
+//					break;
+//				case "6":
+//					test(scanner);
+//					break;
+//				case "7":
+//					dsp();
+//					break;
+//				case "8":
+//					saveVerilog(scanner);
+//					break;
+//				case "9":
+//					quit();
+//					break;
+//				case "10":
+//					printAsC(scanner);
+//					break;
+//				case "11":
+//					printToFile(scanner);
+//					break;
+//				case "12":
+//					automateTraining(scanner);
+//					break;
+//				default:
+//					System.out.println("Invalid Input. Please Enter a valid option.");
+//					break;
+//			}
+//			
+//		}
 	}
 	
 	public static void printOptions()
@@ -198,52 +267,57 @@ public class Interface {
 			
 			String stringNew = string.replace("\\", "/");
 			
-			File file = new File(stringNew);
+			File directory = new File(stringNew);
 			
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			File[] files = directory.listFiles();
 			
-			int numTrainers = Integer.parseInt(reader.readLine());
+			for(File file : files) {
+				
+				BufferedReader reader = new BufferedReader(new FileReader(file));
 			
-			ArrayList<float []> inputs = new ArrayList<float []>();
-			ArrayList<float []> outputs = new ArrayList<float []>();
+				int numTrainers = Integer.parseInt(reader.readLine());
 			
-			for(int k = 0; k < numTrainers; k++)
-			{
-				float in[] = new float[network.inputLayer.size()];
-				float out[] = new float[network.outputLayer.size()];
+				ArrayList<float []> inputs = new ArrayList<float []>();
+				ArrayList<float []> outputs = new ArrayList<float []>();
+			
+				for(int k = 0; k < numTrainers; k++)
+				{
+					float in[] = new float[network.inputLayer.size()];
+					float out[] = new float[network.outputLayer.size()];
 			 
-				for(int i = 0; i < network.inputLayer.size(); i++)
-				{	
-					in[i] = Float.parseFloat(reader.readLine());
-				}
+					for(int i = 0; i < network.inputLayer.size(); i++)
+					{	
+						in[i] = Float.parseFloat(reader.readLine());
+					}
 				
-				for(int i = 0; i < network.outputLayer.size(); i++)
-				{
-					out[i] = Float.parseFloat(reader.readLine());
+					for(int i = 0; i < network.outputLayer.size(); i++)
+					{
+						out[i] = Float.parseFloat(reader.readLine());
 					
+					}
+				
+					inputs.add(in);
+					outputs.add(out);
+				
 				}
-				
-				inputs.add(in);
-				outputs.add(out);
-				
-			}
 			
-			Random random = new Random();
+				Random random = new Random();
 			
-			for(int i = 0; i < iterations; i++)
-			{
-				System.out.println(i + " /" + iterations + " of training complete.");
-				float c =  1; //random.nextFloat();
-				for(int j = 0; j < numTrainers/10; j++)
+				for(int i = 0; i < iterations; i++)
 				{
-					int p = random.nextInt(numTrainers);
-					network.trainNetwork(inputs.get(p), outputs.get(p), c, numTrainers/10,(float) 0.00001);
+					System.out.println(i + " /" + iterations + " of training complete.");
+					float c =  1; //random.nextFloat();
+					for(int j = 0; j < numTrainers/10; j++)
+					{
+						int p = random.nextInt(numTrainers);
+						network.trainNetwork(inputs.get(p), outputs.get(p), c, numTrainers/10,(float) 0.00001);
+					}
 				}
-			}
 			
-			reader.close();
-			System.out.println("Network Succesfully Trained.");
-		}
+				reader.close();
+				System.out.println("Network Succesfully Trained.");
+			}
+		}	
 		else
 			System.out.println("No Network exists. Create a network before training.");
 	}
